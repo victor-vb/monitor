@@ -7,6 +7,7 @@ class Skymavis extends AbstractPipe{
     public function marketNTF()
     {
         $rate = $this->getRate();
+
         $headers = [
             "content-type: application/json",
             "origin: https://marketplace.skymavis.com",
@@ -54,7 +55,7 @@ Row;
         return json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
     }
 
-    public function getRate(){
+    public function getRate($count=0){
         // curl 'https://marketplace-graphql.skymavis.com/graphql' \
         // -H 'content-type: application/json' \
         // -H 'origin: https://marketplace.skymavis.com' \
@@ -77,7 +78,15 @@ Row;
         $response = Tools::curl($api,$row,1,$headers);
         $responseArray = json_decode($response,true);
 
-        return isset($responseArray["data"]["exchangeRate"]) ? $responseArray["data"]["exchangeRate"] : [];
+        $rate = isset($responseArray["data"]["exchangeRate"]) ? $responseArray["data"]["exchangeRate"] : [];
+
+        if(!$rate && $count <=3){
+            $count++;
+            return $this->getRate($count);
+        }
+        
+
+        return $rate;
     }
     
 }
