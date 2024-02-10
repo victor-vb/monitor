@@ -70,17 +70,19 @@ class Process{
     {
         $balls = [];
         $count = [];
-        foreach($markets as $market=>$items){
-            $count[$market] = count($items["items"]);
-            foreach($items["items"] as $item){
-                $item["src"] = $items["src"];
-                if(isset($balls[$item["id"]])){
-                    $other = $balls[$item["id"]];
-                    if($item["eth"] < $other["eth"]){
-                        $balls[$item["id"]] = $item;
+        foreach($markets as $market=>$items){  
+            $rows = isset($items["items"]) ? $items["items"] : [];
+            $count[$market] = count($rows);
+            $src = isset($items["src"]) ? $items["src"] : '';
+            foreach($rows as $row){
+                $row["src"] = $src;
+                if(isset($balls[$row["id"]])){
+                    $other = $balls[$row["id"]];
+                    if($row["eth"] < $other["eth"]){
+                        $balls[$row["id"]] = $row;
                     }
                 }else{
-                    $balls[$item["id"]] = $item;
+                    $balls[$row["id"]] = $row;
                 }
             }
         }
