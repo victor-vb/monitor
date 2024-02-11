@@ -1,8 +1,8 @@
 <?php
-namespace Ball\Markets;
-use Tools;
-
-class Office extends AbstractPipe{
+namespace App\Service\Ball\Markets;
+use App\Lib\Tools;
+class Office extends AbstractBall{
+    
     public function marketNTF()
     {
         $headers = [
@@ -39,6 +39,6 @@ Row;
             "src"=>"https://marketplace.apeironnft.com"
         ];
 
-        return json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+        return $data;
     }
 }

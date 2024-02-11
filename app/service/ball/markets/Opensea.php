@@ -1,8 +1,7 @@
 <?php
-namespace Ball\Markets;
-use Tools;
+namespace App\Service\Ball\Markets;
 
-class Opensea extends AbstractPipe
+class Opensea extends AbstractBall
 {
 
     public function marketNTF()
@@ -30,7 +29,7 @@ class Opensea extends AbstractPipe
             "items"=>$items,
             "src"=>"https://opensea.io/"
         ];
-        return json_encode($data, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+        return $data;
     }
 }
 

@@ -1,4 +1,5 @@
 <?php
+namespace App\Lib;
 class Tools{
 
     public static function curl($url, $params = false, $ispost = 0, $headers = [],$debug=false, $timeout = 10)

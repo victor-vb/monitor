@@ -1,8 +1,8 @@
 <?php
-namespace Ball\Markets;
-use Tools;
+namespace App\Service\Ball\Markets;
+use App\Lib\Tools;
 
-class Skymavis extends AbstractPipe{
+class Skymavis extends AbstractBall{
     
     public function marketNTF()
     {
@@ -52,7 +52,7 @@ Row;
             "src"=>"https://marketplace.skymavis.com"
         ];
 
-        return json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+        return $data;
     }
 
     public function getRate($count=0){
