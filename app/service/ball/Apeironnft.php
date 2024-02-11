@@ -1,5 +1,5 @@
 <?php
-namespace ball;
+namespace App\Service\Ball;
 class Apeironnft
 {
     public $balls = [];

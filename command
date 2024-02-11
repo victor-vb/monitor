@@ -1,5 +1,5 @@
 <?php
-include_once "../autoload.php";
+include_once "./autoload.php";
 class Task{
     
     public $method = "loopRun";
