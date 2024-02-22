@@ -1,6 +1,8 @@
 <?php
 namespace App\Task;
 
+use Exception;
+
 class Protocol{
     public $namespace = 'App\Logic';
     
@@ -10,7 +12,7 @@ class Protocol{
 
     public $data = [];
 
-    public static function new($callbackClass,$callbackMethod,$data = []){
+    public static function new($callbackClass,$callbackMethod="handle",$data = []){
         $protocol = new Protocol();
         $protocol->callbackClass = $callbackClass;
         $protocol->callbackMethod = $callbackMethod;
@@ -45,14 +47,22 @@ class Protocol{
         if(!is_string($protocolString)){
             return $this;
         }
-        $data = json_decode(trim($protocolString),true);
-        foreach($data as $property=>$value){
+        $object = json_decode(trim($protocolString),true);
+        if(!is_array($object)){
+            return $this;
+        }
+        foreach($object as $property=>$value){
             $this->$property = $value;
         }
+        
         return $this;
     }
 
     public function join($other,...$more){
+        if($other->callbackClass && $other->callbackMethod){
+            $this->callbackClass = $other->callbackClass;
+            $this->callbackMethod = $other->callbackMethod;
+        }
         $data = [$other->data];
         foreach($more as $row){
             array_push($data,$row->data);
@@ -63,9 +73,14 @@ class Protocol{
 
     public function call(){
         $className = $this->namespace.'\\'.$this->callbackClass;
+        if(!class_exists($className)){
+            echo Protocol::new("Exception","handle",sprintf("指定回调类:%s不存在！",$className))->serialize();
+            return false;
+        }
         $caller = new $className();
         if(!method_exists($caller,$this->callbackMethod)){
-            throw new \Exception("回调函数不存在");
+            echo Protocol::new("Exception","handle","回调函数不存在")->serialize();
+            return false;
         }
         call_user_func_array([$caller,$this->callbackMethod],[$this->data]);
     }

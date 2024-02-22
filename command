@@ -1,18 +1,30 @@
 <?php
+
+use App\Task\Protocol;
+
 include_once "./autoload.php";
 class Task{
     
-    public $method = "loopRun";
+    public static $method = "loopRun";
 
     public static function Run(){
         $getopt = getopt("c:");
+        $error = [
+            "process"=>"\Task",
+            "data"=>"操作错误！"
+        ];
         if(!isset($getopt["c"])){
-            echo "操作错误！".PHP_EOL;
+            echo Protocol::new("Exception","handle",$error)->serialize();
             return false;
         }
-        $class = $getopt["c"];
-        $task = new static();
-        $method =  $task->method;
+        $class = trim($getopt["c"],"'\"");
+        // $class = $getopt["c"];
+        $method =  self::$method;
+        if (!class_exists($class)){
+            $error["data"] = "{$class}不存在!";
+            echo Protocol::new("Exception","handle",$error)->serialize();
+            return false;
+        }
         call_user_func("{$class}::$method");
     }
 }

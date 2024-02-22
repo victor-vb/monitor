@@ -60,8 +60,8 @@ class Tools{
     public static function sendMessage($text){
         // https://api.telegram.org/bot<token>/getUpdates   获取群组id
         // https://api.telegram.org/bot<token>/sendMessage  发送消息
-        $token = "6115387654:AAHelaTW7a6Yn7_19XF-rU1s6eO-ozBoQLA";
-        $chat_id = "-4162627115";
+        $token = "7086527335:AAGAX5kKIsWgQbu1pBNPIGNCflI1NNeq2Ac";
+        $chat_id = "-4079581944";
         $api = "https://api.telegram.org/bot{$token}/sendMessage";
         $params = [
             "chat_id"=>$chat_id,

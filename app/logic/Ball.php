@@ -14,7 +14,10 @@ class Ball
         foreach ($items as $item) {
             $rows = $item["data"]["items"];
             $src = $item["data"]["src"];
-            $count[ basename(str_replace("\\", "/", $item["process"]))] =count($rows);
+            $classNmae = basename(str_replace("\\", "/", $item["process"]));
+            $count[$classNmae] = count($rows);
+            $txt = sprintf("%s\r\n%s\r\n\r\n",$classNmae,json_encode($rows,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+            file_put_contents(DIR."log.txt",$txt,FILE_APPEND);
             foreach ($rows as &$row) {
                 $row["src"] = $src;
                 if (isset($balls[$row["id"]])) {
@@ -52,4 +55,5 @@ class Ball
         }
         echo sprintf("市场情况:%s,监控时间:%s".PHP_EOL, json_encode($count, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), date("Y-m-d H:i:s"));
     }
+
 }

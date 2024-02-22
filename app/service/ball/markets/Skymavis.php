@@ -4,6 +4,8 @@ use App\Lib\Tools;
 
 class Skymavis extends AbstractBall{
     
+    private $cahcefile = DIR."rate.txt";
+
     public function marketNTF()
     {
         $rate = $this->getRate();
@@ -28,14 +30,22 @@ Row;
 
         foreach ($balls as $item) {
             $id = $item["tokenId"];
-            $ronin = sprintf("%.3f",$item['order']["currentPrice"]/1000000000000000000);
-            $usdt = sprintf("%.3f",$ronin * $rate["ron"]["usd"]);
-            if($usdt < 100 ){
-                $eth = $ronin;
-                $usdt = sprintf("%.3f",$eth * $rate["eth"]["usd"]);
-                $ronin = sprintf("%.3f",$usdt/$rate["ron"]["usd"]);
-            }else{
-                $eth = sprintf("%.3f",$usdt / $rate["eth"]["usd"]);
+            $contracts = $item["order"]["paymentToken"];
+            $proice = sprintf("%.3f",$item['order']["currentPrice"]/1000000000000000000);
+            switch($contracts){
+                    // eth支付
+                case "0xc99a6a985ed2cac1ef41640596c5a5f9f4e19ef5":
+                    $eth = $proice;
+                    $usdt = sprintf("%.3f",$eth * $rate["eth"]["usd"]);
+                    $ronin = sprintf("%.3f",$usdt/$rate["ron"]["usd"]);
+                    break;
+                default:
+                    // ron支付
+                    // 0xe514d9deb7966c8be0ca922de8a064264ea6bcd4
+                    $usdt = sprintf("%.3f",$proice * $rate["ron"]["usd"]);
+                    $ronin = sprintf("%.3f",$usdt/$rate["ron"]["usd"]);
+                    $eth = sprintf("%.3f",$usdt / $rate["eth"]["usd"]);
+                    break;
             }
            
             $breedCount = $item["attributes"]["conjunction count"][0];
@@ -63,7 +73,10 @@ Row;
         // -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36' \
         // --data-raw '{"operationName":"NewEthExchangeRate","variables":{},"query":"query NewEthExchangeRate {\n  exchangeRate {\n    eth {\n      usd\n      __typename\n    }\n    slp {\n      usd\n      __typename\n    }\n    ron {\n      usd\n      __typename\n    }\n    axs {\n      usd\n      __typename\n    }\n    usd {\n      usd\n      __typename\n    }\n    __typename\n  }\n}\n"}' \
         // --compressed
-        
+        $rate = $this->getCacheRate();
+        if($rate){
+            return $rate;
+        }
         $api = "https://marketplace-graphql.skymavis.com/graphql";
 
         $headers = [
@@ -84,9 +97,34 @@ Row;
             $count++;
             return $this->getRate($count);
         }
-        
+        $this->setChcheRate($rate);
 
         return $rate;
     }
+
+    public function setChcheRate($rate){
+        $time = time();
+        $rate = [
+            "timestamp"=>$time,
+            "datetime"=>date("Y-m-d H:i:s",$time),
+            "rate"=>$rate
+        ];
+
+        file_put_contents($this->cahcefile,json_encode($rate,JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE));
+        return true;
+    }
+
+    public function getCacheRate(){
+        $time = time();
+        $rate = json_decode(file_get_contents($this->cahcefile),true);
+        $rate = $rate ? $rate : [];
+        // 缓存5分钟
+        if(isset($rate['timestamp']) && $time-$rate["timestamp"] < 5*60){
+            return $rate["rate"];
+        }else{
+            return [];
+        }
+    }
+
     
 }

@@ -7,7 +7,7 @@ spl_autoload_register(function($file){
    $filename = basename($file);
    $file = DIR."{$dir}/{$filename}.php";
    include_once $file;
-});
+},false);
 
 
 
