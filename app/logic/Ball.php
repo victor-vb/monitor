@@ -37,15 +37,23 @@ class Ball
             if ($id > count($Apeironnft->balls) || !$id) {
                 continue;
             }
+            
             $eth = $ball["eth"];
             $usdt = $ball["usdt"];
             $breedCount = $ball["breedCount"];
             $src = $ball["src"];
-            $ball = $Apeironnft->getBall($id)
-            ->setNowPrice($eth, $usdt)
+            $prifix = $ball["prifix"];
+            $name = $ball["name"];
+            $ronin = $ball["ronin"];
+            if(!$Apeironnft->checkBall($id,$prifix)){
+                continue;
+            }
+            $ball = $Apeironnft->getBall($id,$prifix)
+            ->setNowPrice($eth, $usdt,$ronin)
             ->setReproducecCount($breedCount)
-            ->setSrc($src);
-            $Apeironnft->setBall($id, $ball);
+            ->setSrc($src)
+            ->setName($name);
+            $Apeironnft->setBall($ball);
         }
         $Apeironnft->checkPrice();
         $messages = implode(PHP_EOL, $Apeironnft->messages);

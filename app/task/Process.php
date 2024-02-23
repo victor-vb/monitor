@@ -23,7 +23,6 @@ class Process
         foreach ($this->groups as $callProcessName=>$process) {
             foreach ($process["pipes"] as $pipes) {
                 list($stdin, $stdout, $stderr) =  $pipes;
-                // stream_set_blocking($stdin, false);
                 $protlcol = $tasks->getProtlcol($callProcessName);
                 fwrite($stdin, $protlcol->serialize());
             }
