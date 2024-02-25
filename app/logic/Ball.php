@@ -20,24 +20,22 @@ class Ball
             file_put_contents(DIR."log.txt",$txt,FILE_APPEND);
             foreach ($rows as &$row) {
                 $row["src"] = $src;
-                if (isset($balls[$row["id"]])) {
-                    $other = $balls[$row["id"]];
+                $prifix = $row["prifix"];
+                $id = $row["id"];
+                $key = "{$prifix}_{$id}";
+                if (isset($balls[$key])) {
+                    $other = $balls[$key];
                     if ($row["eth"] < $other["eth"]) {
-                        $balls[$row["id"]] = $row;
+                        $balls[$key] = $row;
                     }
                 } else {
-                    $balls[$row["id"]] = $row;
+                    $balls[$key] = $row;
                 }
             }
         }
 
         $Apeironnft = Apeironnft::getInstance();
-        foreach ($balls as $ball) {
-            $id= $ball["id"];
-            if ($id > count($Apeironnft->balls) || !$id) {
-                continue;
-            }
-            
+        foreach ($balls as $key => $ball) {
             $eth = $ball["eth"];
             $usdt = $ball["usdt"];
             $breedCount = $ball["breedCount"];
@@ -45,6 +43,7 @@ class Ball
             $prifix = $ball["prifix"];
             $name = $ball["name"];
             $ronin = $ball["ronin"];
+            $id = $ball["id"];
             if(!$Apeironnft->checkBall($id,$prifix)){
                 continue;
             }

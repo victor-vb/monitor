@@ -59,7 +59,11 @@ Row;
             }
 
             $breedCount = $item["attributes"]["conjunction count"][0];
-            array_push($items, $this->getItem($id, "origin", $eth, $usdt, $ronin, $breedCount));
+
+            preg_match("/[\w]+/", $item["name"], $name);
+            $name = isset($name[0]) ? $name[0] : '';
+
+            array_push($items, $this->getItem($id, "origin", $eth, $usdt, $ronin, $breedCount,$name));
         }
         return $items;
     }
@@ -106,7 +110,8 @@ Row;
 
             $breedCount = -1;
             preg_match("/[\w]+/", $item["name"], $name);
-            array_push($items, $this->getItem($id, "derived", $eth, $usdt, $ronin, $breedCount, $name[0]));
+            $name = isset($name[0]) ? $name[0] : '';
+            array_push($items, $this->getItem($id, "derived", $eth, $usdt, $ronin, $breedCount, $name));
         }
         return $items;
     }
