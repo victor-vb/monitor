@@ -2,6 +2,8 @@
 
 namespace App\Service\Ball;
 
+use App\Service\Ball\BallInfo\Attributes;
+
 class Ball
 {
     public $id;
@@ -14,6 +16,8 @@ class Ball
      * @var float
      */
     public $maxPriceEth;
+
+    public $maxPriceEthfloatUp = 0;
 
     /**
     * 最后一次网络请求价格
@@ -33,6 +37,10 @@ class Ball
 
     public $src;
     public $name;
+
+    public $attr = null;
+
+    public $caller = null;
 
     public function __construct($id, $prifix, $enname='', $maxPriceEth=0)
     {
@@ -68,6 +76,26 @@ class Ball
         return $this;
     }
 
+    public function setMaxPriceEthfloatUp($float): Ball
+    {
+        $this->maxPriceEthfloatUp = $float;
+        return $this;
+    }
+
+    public function setAttr($attr): Ball
+    {
+        $this->attr = $attr;
+        return $this;
+    }
+
+    public function setCaller($caller): Ball
+    {
+        if (class_exists($caller)) {
+            $this->caller = new $caller();
+        }
+        return $this;
+    }
+
 
     public function getBallMaxprice(): bool
     {
@@ -75,11 +103,11 @@ class Ball
             return false;
         }
 
-        
+
         /**
          * 当eth和ron两个币种都有变动，说明此商品是上架或者重新上架的操作，则更新所有价格
          */
-        if ($this->lastPriceRon != $this->nowPriceRon && $this->lastPriceEth != $this->nowPriceEth) {
+        if ($this->lastPriceRon != $this->nowPriceRon && $this->lastPriceEth != $this->nowPriceEth && $this->lastPriceEth > $this->nowPriceEth) {
             $this->lastPriceEth = $this->nowPriceEth;
             $this->lastPriceRon = $this->nowPriceRon;
 
@@ -92,8 +120,9 @@ class Ball
             }
         }
 
+        $maxPriceEth = sprintf("%0.3f", $this->maxPriceEth * (1+$this->maxPriceEthfloatUp));
         $checked = false;
-        if ($this->maxPriceEth >= $this->nowPriceEth) {
+        if ($maxPriceEth >= $this->nowPriceEth) {
             if ($this->lastPriceUsdt > 0) {
                 /**
                  * 如果当前eth的价格小于设定的价格，但是不是首次监听，存在最后一次的价格
@@ -104,8 +133,8 @@ class Ball
                 $diff = $this->lastPriceUsdt - $this->nowPriceUsdt;
                 if ($diff>0 && $diff/$this->lastPriceUsdt >= 0.05) {
                     // 更新本次的usdt价格
-                    $this->lastPriceUsdt = $this->nowPriceUsdt;
                     $checked = true;
+                    $this->lastPriceUsdt = $this->nowPriceUsdt;
                 }
             } else {
                 // 如果当前eth的价格小于设定的价格，并且是首次监听，则认定她是满足条件
@@ -119,18 +148,19 @@ class Ball
 
     public function toString()
     {
-        $string = sprintf(
-            "资源id:%s \n球类型:%s \n繁殖次数:%s \n现价:%sE %sU %sR \n触发价:%sE \n挂单来源:%s\n",
-            $this->id,
-            $this->enname,
-            $this->reproducecCount,
-            $this->nowPriceEth,
-            $this->nowPriceUsdt,
-            $this->nowPriceRon,
-            $this->maxPriceEth,
-            $this->src
-        );
+        $maxPriceEthfloatUp = (1+$this->maxPriceEthfloatUp)*100;
+        $nowMaxPriceEth = sprintf("%.3f", $this->maxPriceEth * $maxPriceEthfloatUp/100);
+        $attr = $this->attr instanceof Attributes ? $this->attr->toString() : '';
+        $property = strtolower($this->prifix) == "origin" ? "\n拥有属性:{$attr}" : '';
+        $string =<<<data
+资源id:{$this->id} 
+球类型:{$this->enname} 
+繁殖次数:{$this->reproducecCount} 
+现价价值:{$this->nowPriceEth}E  {$this->nowPriceUsdt}U  {$this->nowPriceRon}R 
+触发底价:{$this->maxPriceEth}E  触发价:{$nowMaxPriceEth}E  上浮:{$maxPriceEthfloatUp}%{$property}
+挂单来源:{$this->src}
+data;
 
-        return $string;
+        return trim($string);
     }
 }

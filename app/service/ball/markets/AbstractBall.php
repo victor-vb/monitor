@@ -3,20 +3,36 @@
 namespace App\Service\Ball\Markets;
 
 use App\Task\AbstractProcess;
-use App\Task\Protocol;
 use App\Lib\Tools;
+use App\Service\Ball\BallInfo\Attributes;
+
 abstract class AbstractBall extends AbstractProcess implements InterfaceBall
 {
     protected $cahcefile = DIR."rate.txt";
 
+    protected $cacheAttrFile  = DIR."attrs.txt";
+
     protected $rate;
 
     protected $src;
-   
+
+    protected $before_time;
+
+    public const MAX_SLEEP_TIME = 5;
+
+    // completed
+    protected $completed_ids = [
+
+    ];
+
+    protected $uncompleted_ids = [];
+
     public function before()
     {
+        $this->before_time = time();
         $this->setSrc();
         $this->rate = $this->getRate();
+        $this->completed_ids = $this->loadAttrs();
     }
     public function main()
     {
@@ -26,20 +42,76 @@ abstract class AbstractBall extends AbstractProcess implements InterfaceBall
 
     public function after()
     {
-        sleep(15);
+        $ids = [];
+        foreach ($this->uncompleted_ids as $id) {
+            if (!in_array($id, array_keys($this->completed_ids))) {
+                array_push($ids, $id);
+            }
+        }
+        foreach ($ids as $id) {
+            $idinfo = explode("_", $id, 2);
+            list($_, $planetID) = $idinfo;
+            $method = "getOriginBallInfo";
+            if (method_exists($this, $method)) {
+                $attr = $this->$method($planetID);
+                if ($attr instanceof Attributes) {
+                    $this->completed_ids[$id] = $attr;
+                }
+                if (time()-$this->before_time >= static::MAX_SLEEP_TIME-1) {
+                    break;
+                }
+            }
+        }
+        $time = time()-$this->before_time;
+        if ($time < static::MAX_SLEEP_TIME) {
+            sleep(static::MAX_SLEEP_TIME-$time);
+        }
+        $this->uncompleted_ids = [];
+        $this->saveAttrs();
+        sleep(static::MAX_SLEEP_TIME);
     }
 
-    public function getItem($id, $prifix, $eth, $usdt, $ronin,$breedCount,$name="")
+    public function getBallInfo()
     {
-        return [
+        $ids = [];
+        foreach ($this->uncompleted_ids as $id) {
+            if (!in_array($id, array_keys($this->completed_ids))) {
+                array_push($ids, $id);
+            }
+        }
+        foreach ($ids as $id) {
+            $idinfo = explode("_", $id, 2);
+            list($_, $planetID) = $idinfo;
+            $method = "getOriginBallInfo";
+            if (method_exists($this, $method)) {
+                $attr = $this->$method($planetID);
+                if ($attr instanceof Attributes) {
+                    $this->completed_ids[$id] = $attr;
+                }
+                if (time()-$this->before_time >= static::MAX_SLEEP_TIME-1) {
+                    break;
+                }
+            }
+        }
+        $this->uncompleted_ids = [];
+        $this->saveAttrs();
+    }
+
+    public function getItem($id, $prifix, $eth, $usdt, $ronin, $breedCount, $name="")
+    {
+        $key = "{$prifix}_{$id}";
+        $attrs = isset($this->completed_ids[$key]) ? $this->completed_ids[$key] : "";
+        $item =  [
             "id"=>$id,
             "eth"=>sprintf("%.3f", $eth),
             "usdt"=>sprintf("%.3f", $usdt),
             "ronin"=>sprintf("%.3f", $ronin),
             "breedCount"=>$breedCount,
             "name"=>$name,
-            "prifix"=>$prifix
+            "prifix"=>$prifix,
+            "attrs"=>$attrs instanceof Attributes ? $attrs->toArray() : []
          ];
+        return $item;
     }
 
     /**
@@ -109,5 +181,45 @@ Row;
         } else {
             return [];
         }
+    }
+
+    public function loadAttrs()
+    {
+        $attrs = [];
+        if (file_exists($this->cacheAttrFile)) {
+            $cached = json_decode(file_get_contents($this->cacheAttrFile), true);
+            if ($cached) {
+                foreach ($cached as $complexid => $array) {
+                    $attr = Attributes::from($array);
+                    if ($attr instanceof Attributes) {
+                        $attrs[$complexid]  = $attr;
+                    }
+                }
+            }
+        }
+        return $attrs;
+    }
+
+    public function getAttr($attrs, $planet_id, $prifix="origin")
+    {
+        $complexid = "{$prifix}_{$planet_id}";
+        if (isset($attrs[$complexid])) {
+            return $attrs[$complexid];
+        } else {
+            return null;
+        }
+    }
+
+    public function saveAttrs($extra = [])
+    {
+        $attrs = [];
+        $rows  = array_merge($this->completed_ids, $extra);
+        foreach ($rows as $complexid=>$attr) {
+            if ($attr instanceof Attributes) {
+                $attrs[$complexid] = $attr->toArray();
+            }
+        }
+        $attrs = array_merge($attrs, $this->loadAttrs());
+        file_put_contents($this->cacheAttrFile, json_encode($attrs), LOCK_EX);
     }
 }

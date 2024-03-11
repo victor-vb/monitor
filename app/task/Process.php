@@ -11,7 +11,7 @@ class Process
     );
 
 
-    public $groups = [];
+    public static $groups = [];
 
     public function run(callable $fun)
     {
@@ -20,7 +20,7 @@ class Process
 
         $this->process($processes);
 
-        foreach ($this->groups as $callProcessName=>$process) {
+        foreach (self::$groups as $callProcessName=>$process) {
             foreach ($process["pipes"] as $pipes) {
                 list($stdin, $stdout, $stderr) =  $pipes;
                 $protlcol = $tasks->getProtlcol($callProcessName);
@@ -30,7 +30,7 @@ class Process
 
 
         for (;;) {
-            foreach ($this->groups as $callProcessName=>$process) {
+            foreach (self::$groups as $callProcessName=>$process) {
                 foreach ($process["pipes"] as $pipes) {
                     list($stdin, $stdout, $stderr) =  $pipes;
                     stream_set_blocking($stdout, false);
@@ -66,11 +66,12 @@ class Process
             foreach ($rows["process"] as $command) {
                 $process = proc_open($command, $this->desc, $pipes, DIR, getenv(), $options);
                 if (is_resource($process)) {
-                    $this->groups[$callProcessName]["process"][] =  $process;
-                    $this->groups[$callProcessName]["pipes"][] = $pipes;
-                    $this->groups[$callProcessName]["data"] = [];
+                    self::$groups[$callProcessName]["process"][] =  $process;
+                    self::$groups[$callProcessName]["pipes"][] = $pipes;
+                    self::$groups[$callProcessName]["data"] = [];
                 }
             }
         }
+
     }
 }
