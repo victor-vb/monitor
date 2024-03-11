@@ -56,7 +56,7 @@ class Apeironnft
         $this->makeIteraor(14, 387, "Divine", 2.5, "origin");
         $this->makeIteraor(387, 1133, "Arcane", 0.73, "origin");
         $this->makeIteraor(1133, 3188, "Mythic", 0.37, "origin");
-         $this->makeIteraor(3188, 5000, "Elemental", 0.15, "origin");
+         $this->makeIteraor(3188, 4585, "Elemental", 0.15, "origin");
     }
 
     public function initDerivedNFT()

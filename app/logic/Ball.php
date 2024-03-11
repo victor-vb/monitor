@@ -12,14 +12,14 @@ class Ball
     {
         $count = [];
         $balls = [];
-        $messages = [sprintf("date:%s",date("Y-m-d H:i:s"))];
+        $messages = [sprintf("date:%s", date("Y-m-d H:i:s"))];
         foreach ($items as $item) {
             $rows = $item["data"]["items"];
             $src = $item["data"]["src"];
             $classNmae = basename(str_replace("\\", "/", $item["process"]));
             $count[$classNmae] = count($rows);
-            
-            array_push($messages,$classNmae);
+
+            array_push($messages, $classNmae);
             foreach ($rows as &$row) {
                 $row["src"] = $src;
                 $row["caller"] = $item["process"];
@@ -39,13 +39,13 @@ class Ball
                 } else {
                     $balls[$key] = $row;
                 }
-                $log = sprintf("id:%s,E:%s,R:%s,U:%s,B:%s",$id,$eth,$ronin,$usdt,$breedCount);
+                $log = sprintf("id:%s,E:%s,R:%s,U:%s,B:%s", $id, $eth, $ronin, $usdt, $breedCount);
                 array_push($messages, $log);
             }
         }
         array_push($messages, "\n\n");
 
-        file_put_contents(DIR."log.txt", implode(PHP_EOL,$messages), FILE_APPEND);
+        file_put_contents(DIR."log.txt", implode(PHP_EOL, $messages), FILE_APPEND);
 
         $Apeironnft = Apeironnft::getInstance();
         foreach ($balls as $key => $ball) {
@@ -83,8 +83,8 @@ class Ball
                         if (in_array($ball->enname, ["Arcane","Mythic"])) {
                             $ball->setMaxPriceEthfloatUp(2);
                         }
-                        if(in_array($ball->enname, ["Divine"])){
-                             $ball->setMaxPriceEthfloatUp(1);
+                        if (in_array($ball->enname, ["Divine"])) {
+                            $ball->setMaxPriceEthfloatUp(1);
                         }
                         break;
                     default:
@@ -95,10 +95,14 @@ class Ball
             $Apeironnft->setBall($ball);
         }
         $Apeironnft->checkPrice();
-        $messages = implode(PHP_EOL.PHP_EOL, $Apeironnft->messages);
-        if ($messages) {
-            echo $messages.PHP_EOL;
-            Tools::sendMessage($messages);
+        if ($Apeironnft->messages) {
+            $messagesChunk = array_chunk($Apeironnft->messages, 5);
+            array_map(function ($messages) {
+                $message = implode(PHP_EOL.PHP_EOL, $messages);
+                echo $message.PHP_EOL;
+                Tools::sendMessage($message);
+            }, $messagesChunk);
+
             $Apeironnft->messages = [];
         }
         echo sprintf("市场情况:%s,监控时间:%s".PHP_EOL, json_encode($count, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), date("Y-m-d H:i:s"));
