@@ -19,7 +19,11 @@ class CacheAttrs extends AbstractProcess
     public function main()
     {
         $lists = [];
-        $makerts = [new Office(),new Skymavis(),new Opensea()];
+        $makerts = [
+            new Office(),
+            new Skymavis(),
+            // new Opensea()
+        ];
         $office = $makerts[0];
         $attrs = $office->loadAttrs();
         $uncompeleted_ids = [];
@@ -33,6 +37,7 @@ class CacheAttrs extends AbstractProcess
         }
 
         foreach ($uncompeleted_ids as $id) {
+            echo "正在更新id:{$id}相关属性信息".PHP_EOL;
             foreach ($makerts as $market) {
                 $attr = $market->getOriginBallInfo($id);
                 if ($attr instanceof Attributes) {

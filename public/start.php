@@ -10,7 +10,7 @@ $call = function () {
     $tasks = Tasks::instance("BallTask",'App\Service\Ball\Markets')->setWaitAll(true)->setProtocol($protocol);
     $tasks->setCallClassName("Office")->add();
     $tasks->setCallClassName("Skymavis")->add();
-    $tasks->setCallClassName("Opensea")->add();
+    // $tasks->setCallClassName("Opensea")->add();
 
     // $protocol = Protocol::new("Sol", "handle");
     // $tasks = Tasks::instance("SolTask", 'App\Service\Sol')->setProtocol($protocol);
