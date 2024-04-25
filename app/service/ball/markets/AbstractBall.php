@@ -148,11 +148,25 @@ Row;
 
         $rate = isset($responseArray["data"]["exchangeRate"]) ? $responseArray["data"]["exchangeRate"] : [];
 
-        if (!$rate && $count <=3) {
+        $checkRate = true;
+        foreach ($rate as $row) {
+            if (!isset($row['usd'])) {
+                $checkRate = false;
+                break;
+            }
+            if (isset($row['usd']) && $row['usd'] <= 0) {
+                $checkRate = false;
+                break;
+            }
+        }
+
+        if ((!$rate || !$checkRate) && $count <=3) {
             $count++;
             return $this->getRate($count);
         }
-        $this->setChcheRate($rate);
+        if ($rate && $checkRate) {
+            $this->setChcheRate($rate);
+        }
 
         return $rate;
     }
@@ -173,7 +187,11 @@ Row;
     public function getCacheRate()
     {
         $time = time();
-        $rate = json_decode(file_get_contents($this->cahcefile), true);
+        if (file_exists($this->cahcefile)) {
+            $rate = json_decode(file_get_contents($this->cahcefile), true);
+        }else{
+            $rate = [];
+        }
         $rate = $rate ? $rate : [];
         // 缓存5分钟
         if (isset($rate['timestamp']) && $time-$rate["timestamp"] < 3*60) {
