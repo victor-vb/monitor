@@ -62,12 +62,12 @@ abstract class AbstractBall extends AbstractProcess implements InterfaceBall
                 }
             }
         }
-        $time = time()-$this->before_time;
-        if ($time < static::MAX_SLEEP_TIME) {
-            sleep(static::MAX_SLEEP_TIME-$time);
-        }
-        $this->uncompleted_ids = [];
-        $this->saveAttrs();
+        // $time = time()-$this->before_time;
+        // if ($time < static::MAX_SLEEP_TIME) {
+        //    sleep(static::MAX_SLEEP_TIME-$time);
+        // }
+        // $this->uncompleted_ids = [];
+        // $this->saveAttrs();
         sleep(static::MAX_SLEEP_TIME);
     }
 
