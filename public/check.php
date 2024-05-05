@@ -7,7 +7,7 @@ if(!$output){
     $tgmsg = "检测服务进程已退出，尝试重新拉起";
     App\Lib\Tools::sendMessage($tgmsg);
 
-    exec("php /home/monitor/public/start.php>/dev/null &", $output);
+    exec("cd /home/monitor/public && php start.php>/dev/null &", $output);
     $message.= $tgmsg.PHP_EOL;
 }else{
     $message.= "当前服务正常".PHP_EOL;
