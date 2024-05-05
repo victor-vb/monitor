@@ -16,4 +16,4 @@ if(!$output){
 
 $message .= "doned".PHP_EOL;
 
-file_put_contents(DIR."/check.log",$message);
+file_put_contents(DIR."/check.log",$message,FILE_APPEND);
