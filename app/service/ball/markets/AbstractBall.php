@@ -119,7 +119,7 @@ abstract class AbstractBall extends AbstractProcess implements InterfaceBall
      * @param integer $count
      * @return void
      */
-    public function getRate($count=0)
+    public function getRate()
     {
         // curl 'https://marketplace-graphql.skymavis.com/graphql' \
         // -H 'content-type: application/json' \
@@ -160,7 +160,8 @@ Row;
             }
         }
 
-        if ($nozero) {
+        if ($nozero || !$rate) {
+            usleep(1000);
             return $this->getRate();
         }
         if ($rate) {
