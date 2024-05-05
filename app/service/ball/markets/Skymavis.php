@@ -48,15 +48,15 @@ Row;
                     // eth支付
                 case "0xc99a6a985ed2cac1ef41640596c5a5f9f4e19ef5":
                     $eth = $proice;
-                    $usdt = sprintf("%.3f", $eth * $this->rate["eth"]["usd"]);
-                    $ronin = sprintf("%.3f", $usdt/$this->rate["ron"]["usd"]);
+                    $usdt = sprintf("%.3f", $eth * $this->rate["eth"]);
+                    $ronin = sprintf("%.3f", $usdt/$this->rate["ron"]);
                     break;
                 default:
                     // ron支付
                     // 0xe514d9deb7966c8be0ca922de8a064264ea6bcd4
-                    $usdt = sprintf("%.3f", $proice * $this->rate["ron"]["usd"]);
-                    $ronin = sprintf("%.3f", $usdt/$this->rate["ron"]["usd"]);
-                    $eth = sprintf("%.3f", $usdt/$this->rate["eth"]["usd"]);
+                    $usdt = sprintf("%.3f", $proice * $this->rate["ron"]);
+                    $ronin = sprintf("%.3f", $usdt/$this->rate["ron"]);
+                    $eth = sprintf("%.3f", $usdt/$this->rate["eth"]);
                     break;
             }
 

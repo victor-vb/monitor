@@ -32,7 +32,7 @@ class Opensea extends AbstractBall
             $prices = $node["orderData"]["bestAskV2"]["priceType"];
             $eth = sprintf("%.3f", $prices["eth"]);
             $usdt = sprintf("%.3f", $prices["usd"]);
-            $ronin = sprintf("%.3f", $usdt/$this->rate["ron"]["usd"]);
+            $ronin = sprintf("%.3f", $usdt/$this->rate["ron"]);
 
             // $key = "{$prifix}_{$id}";
             // array_push($this->uncompleted_ids, $key);
@@ -89,12 +89,12 @@ class Opensea extends AbstractBall
             switch ($symbol) {
                 case "ETH":
                     $eth = $price;
-                    $ronin = $usdt/$this->rate["ron"]["usd"];
+                    $ronin = $usdt/$this->rate["ron"];
 
                     break;
                 default:
                     $ronin = $price;
-                    $eth = $usdt/$this->rate["eth"]["usd"];
+                    $eth = $usdt/$this->rate["eth"];
             }
 
             $breedCount = -1;

@@ -49,7 +49,7 @@ Row;
             $usdt = $node["priceInUSD"];
             $eth = $node["listingInfo"]["startPrice"];
             $breedCount = $node["breedCount"];
-            $ronin = sprintf("%.3f", $usdt/$this->rate["ron"]["usd"]);
+            $ronin = sprintf("%.3f", $usdt/$this->rate["ron"]);
             array_push($items, $this->getItem($id, $prifix, $eth, $usdt, $ronin, $breedCount,$name));
         }
 
@@ -106,10 +106,10 @@ Row;
             $node = $item["node"];
             $id = $node["starID"];
             $eth = $node["listingInfo"]["startPrice"];
-            $usdt = $eth * $this->rate["eth"]["usd"];
+            $usdt = $eth * $this->rate["eth"];
             $breedCount = -1;
             $name = $node["starName"];
-            $ronin = $usdt/$this->rate["ron"]["usd"];
+            $ronin = $usdt/$this->rate["ron"];
             array_push($items, $this->getItem($id, "derived", $eth, $usdt, $ronin, $breedCount, $name));
         }
 

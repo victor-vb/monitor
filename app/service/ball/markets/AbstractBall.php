@@ -146,25 +146,24 @@ Row;
         $response = Tools::curl($api, $row, 1, $headers);
         $responseArray = json_decode($response, true);
 
-        $rate = isset($responseArray["data"]["exchangeRate"]) ? $responseArray["data"]["exchangeRate"] : [];
+        $exchangeRate = isset($responseArray["data"]["exchangeRate"]) ? $responseArray["data"]["exchangeRate"] : [];
 
-        $checkRate = true;
-        foreach ($rate as $row) {
-            if (!isset($row['usd'])) {
-                $checkRate = false;
-                break;
-            }
-            if (isset($row['usd']) && $row['usd'] <= 0) {
-                $checkRate = false;
-                break;
+        $rate = [];
+        $nozero = false;
+        foreach ($exchangeRate as $symbol => $row) {
+            if (isset($row["usd"]) && is_numeric($row["usd"])) {
+                $rate[$symbol] = $row["usd"];
+                if ($row["usd"] == 0) {
+                    $nozero = true;
+                    break;
+                }
             }
         }
 
-        if ((!$rate || !$checkRate) && $count <=3) {
-            $count++;
-            return $this->getRate($count);
+        if ($nozero) {
+            return $this->getRate();
         }
-        if ($rate && $checkRate) {
+        if ($rate) {
             $this->setChcheRate($rate);
         }
 
@@ -189,7 +188,7 @@ Row;
         $time = time();
         if (file_exists($this->cahcefile)) {
             $rate = json_decode(file_get_contents($this->cahcefile), true);
-        }else{
+        } else {
             $rate = [];
         }
         $rate = $rate ? $rate : [];

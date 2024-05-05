@@ -1,1 +1,1 @@
-{"timestamp":1714043419,"datetime":"2024-04-25 19:10:19","rate":{"eth":{"usd":3084.13,"__typename":"ExchangeRateCurrency"},"slp":{"usd":0.0040347,"__typename":"ExchangeRateCurrency"},"ron":{"usd":3.03,"__typename":"ExchangeRateCurrency"},"axs":{"usd":7.18,"__typename":"ExchangeRateCurrency"},"usd":{"usd":1,"__typename":"ExchangeRateCurrency"},"__typename":"ExchangeRate"}}
+{"timestamp":1714875520,"datetime":"2024-05-05 10:18:40","rate":{"eth":3089.26,"slp":0.00391385,"ron":2.71,"axs":7.4,"usd":1}}
